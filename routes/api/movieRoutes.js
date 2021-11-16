@@ -15,17 +15,73 @@ router.get('/:page?', (req, res) => {
     );
 });
 
-// Find all movies using the query parameter
-router.get('/year/:year'),
-  (req, res) => {
-    const { year } = req.params;
+// Get all movies or a single movie
+router.get('/:id?', (req, res) => {
+  let id = new require('mongodb').ObjectID(req.params.id);
+  if (id) {
+    const movie = movies.findOne({ _id: id });
+    movie
+      .then((result) => {
+        console.log(result);
+        return res.status(200).send(result);
+      })
+      .catch((err) => res.status(500).send(err));
+  } else {
+    const movies = movies.find({});
     movies
-      .find({ year: parseInt(year, 10) })
-      .limit(20)
-      .toArray((err, results) =>
-        err ? res.status(500).send(err) : res.status(200).send(results)
-      );
-  };
+      .then((result) => res.status(200).send(result))
+      .catch((err) => res.status(500).send(err));
+  }
+});
+
+// find movie by year
+router.get('/year/:year', (req, res) => {
+  console.log('in the year route');
+  let { year } = req.params;
+  year = parseInt(year);
+  movies
+    ? movies
+        .find({ year })
+        .limit(20)
+        .toArray((err, results) =>
+          err ? res.status(500).send(err) : res.status(200).send(results)
+        )
+    : res.status(400).send('Invalid year');
+});
+
+// Create a new movie
+router.post('/', (req, res) => {
+  let newMovie = req.body;
+  movies.insertOne(newMovie, (err, result) =>
+    err ? res.status(500).send(err) : res.status(200).send(result)
+  );
+});
+
+// Update a specific movie
+router.put('/:id', (req, res) => {
+  const { id } = req.params;
+  id = new require('mongodb').ObjectID(id);
+  let updatedMovie = req.body;
+  movies.updateOne({ _id: id }, updatedMovie, (err, result) =>
+    err ? res.status(500).send(err) : res.status(200).send(result)
+  );
+});
+
+// Update several movies at once
+router.put('/', (req, res) => {
+  let updatedMovies = req.body;
+  movies.updateMany(updatedMovies, (err, result) =>
+    err ? res.status(500).send(err) : res.status(200).send(result)
+  );
+});
+
+// Delete a specific movie
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  movies.deleteOne({ _id: id }, (err, result) =>
+    err ? res.status(500).send(err) : res.status(200).send(result)
+  );
+});
 
 // Route that will accept an aggregation query as the body and return the results sorted by box office
 router.get('/best/:page', (req, res) => {
