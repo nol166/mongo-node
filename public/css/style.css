@@ -1,0 +1,40 @@
+.flexbox {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+#movies {
+  width: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+@media screen and (max-width: 600px) {
+  #movies {
+    width: 100%;
+  }
+}
+
+.btn {
+  /* color: white; */
+  margin: 5px;
+  /* border: none;  */
+  border-radius: 10px;
+  /* cursor: pointer; */
+  width: auto;
+  margin-bottom: 5%;
+}
+
+header {
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font: normal 4em 'Playfair Display SC', serif;
+  text-align: center;
+}
