@@ -15,7 +15,7 @@ router.get('/:page?', (req, res) => {
     );
 });
 
-// Get all movies or a single movie
+// Get all movies or a single movie if an id is provided
 router.get('/:id?', (req, res) => {
   let id = new require('mongodb').ObjectID(req.params.id);
   if (id) {
@@ -34,9 +34,8 @@ router.get('/:id?', (req, res) => {
   }
 });
 
-// find movie by year
+// find movies by year
 router.get('/year/:year', (req, res) => {
-  console.log('in the year route');
   let { year } = req.params;
   year = parseInt(year);
   movies
@@ -51,7 +50,7 @@ router.get('/year/:year', (req, res) => {
 
 // Create a new movie
 router.post('/', (req, res) => {
-  let newMovie = req.body;
+  const newMovie = req.body;
   movies.insertOne(newMovie, (err, result) =>
     err ? res.status(500).send(err) : res.status(200).send(result)
   );
@@ -59,8 +58,7 @@ router.post('/', (req, res) => {
 
 // Update a specific movie
 router.put('/:id', (req, res) => {
-  const { id } = req.params;
-  id = new require('mongodb').ObjectID(id);
+  const id = new require('mongodb').ObjectID(req.params.id);
   let updatedMovie = req.body;
   movies.updateOne({ _id: id }, updatedMovie, (err, result) =>
     err ? res.status(500).send(err) : res.status(200).send(result)
@@ -75,9 +73,9 @@ router.put('/', (req, res) => {
   );
 });
 
-// Delete a specific movie
+// Delete a specific movie with an id
 router.delete('/:id', (req, res) => {
-  const { id } = req.params;
+  const id = new require('mongodb').ObjectID(req.params.id);
   movies.deleteOne({ _id: id }, (err, result) =>
     err ? res.status(500).send(err) : res.status(200).send(result)
   );
