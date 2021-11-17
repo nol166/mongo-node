@@ -3,12 +3,13 @@ const { client } = require('../../db/connection');
 
 const movies = client.db('sample_mflix').collection('movies');
 
-// Find all movies from mongodb
+// Find all movies from mongodb, optionally paginated
+// Limits results to 10 per page
 router.get('/:page?', (req, res) => {
   let pageNumber = req.params.page || 1;
   movies
     .find({})
-    .limit(20)
+    .limit(10)
     .skip(pageNumber * 20)
     .toArray((err, results) =>
       err ? res.status(500).send(err) : res.status(200).send(results)
@@ -41,7 +42,7 @@ router.get('/year/:year', (req, res) => {
   movies
     ? movies
         .find({ year })
-        .limit(20)
+        .limit(10)
         .toArray((err, results) =>
           err ? res.status(500).send(err) : res.status(200).send(results)
         )
@@ -84,7 +85,6 @@ router.delete('/:id', (req, res) => {
 // Route that will accept an aggregation query as the body and return the results sorted by box office
 router.get('/best/:page', (req, res) => {
   const { page } = req.params;
-  console.info('🚀 - file: movieRoutes.js - pageNumber', page);
 
   const pipeline = [
     {

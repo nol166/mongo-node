@@ -13,3 +13,5 @@ client.on('open', () => {
   app.use(routes);
   app.listen(port, () => console.log('Server running on port 3000 🚀'));
 });
+
+console.log('Web interface available at http://localhost:3000');
