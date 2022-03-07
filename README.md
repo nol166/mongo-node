@@ -10,3 +10,7 @@ Simple CRUD example using the MongoDB driver for Node.js.
 ## Interface
 
 Web interface available at `http://localhost:3000/`.
+
+## Deployed on Heroku
+  
+  [![Deployed on Heroku](https://img.shields.io/badge/Deployed%20on-Heroku-blue.svg)](https://pipeline-leaf.herokuapp.com/)
