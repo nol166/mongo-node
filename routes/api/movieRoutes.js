@@ -84,17 +84,31 @@ router.delete('/:id', (req, res) => {
 
 // Route that will accept an aggregation query as the body and return the results sorted by box office
 router.get('/best/:page', (req, res) => {
-  const { page } = req.params;
+  const page = parseInt(req.params.page, 10) || 1;
+  
+  const skipAmount = (page - 1) * 20;
 
   const pipeline = [
     {
       $match: {
         'imdb.rating': { $gte: 7, $lte: 10 },
-        'awards.wins': { $gte: 10 },
+        'awards.wins': { $gte: 4 },
         rated: { $nin: ['G', 'PG'] },
-        genres: { $in: ['Action', 'Comedy'] },
         year: { $gte: new Date().getFullYear() - 10 },
         boxOffice: { $ne: parseFloat(100) },
+      },
+    },
+    {
+      $group: {
+        _id: '$title', // Group by title
+        title: { $first: '$title' },
+        year: { $first: '$year' },
+        rated: { $first: '$rated' },
+        poster: { $first: '$poster' },
+        fullplot: { $first: '$fullplot' },
+        boxOffice: { $first: '$boxOffice' },
+        imdb: { $first: '$imdb' },
+        metacritic: { $first: '$metacritic' },
       },
     },
     {
@@ -114,18 +128,20 @@ router.get('/best/:page', (req, res) => {
       $sort: { metacritic: -1 },
     },
     {
-      $skip: page * 20,
+      $skip: page === 1 ? 0 : skipAmount,
     },
     {
       $limit: 20,
     },
   ];
 
-  movies
-    .aggregate(pipeline)
-    .toArray((err, results) =>
-      err ? res.status(500).send(err) : res.status(200).send(results)
-    );
+  // run the aggregation pipeline
+  let movie_results = movies.aggregate(pipeline).toArray();
+  if (movie_results) {
+    movie_results
+      .then((result) => res.status(200).send(result))
+      .catch((err) => res.status.send(err));
+  }
 });
 
 module.exports = router;
